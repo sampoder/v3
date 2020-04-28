@@ -1,4 +1,4 @@
-const AirtablePlus = require('airtable-plus')
+import AirtablePlus from 'airtable-plus'
 
 const joinTable = new AirtablePlus({
   apiKey: process.env.AIRTABLE_API_KEY,
