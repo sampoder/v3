@@ -39,6 +39,7 @@ export default async (req, res) => {
         'City': data.city,
         'State/Province': data.state,
         'Postal Code': data.zipCode,
+        'Country': data.country,
         'Person': [personRecord.id]
       })
     }
@@ -47,21 +48,6 @@ export default async (req, res) => {
         filterByFormula: `{Person ID} = '${personRecord[0].fields['ID']}'`
       }))[0]
     }
-
-    /*fetch(`https://hooks.zapier.com/hooks/catch/507705/o5jrdn3/`, {
-        method: 'POST',
-        body: {
-          'test': false,
-          'scenarioRecordID': 'recNDwjb7Zr04Szix',
-          'receiverAddressRecordID': address.id,
-          'missionNotes': 'Requested via hackclub.com'
-        },
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(r => { console.log(r.statusText); res.json({ status: 'success' }) })
-        .catch(err => console.log(err))*/
 
     axios.post(`https://hooks.zapier.com/hooks/catch/507705/o2dbufn/`, {
       'test': false,

@@ -1,5 +1,6 @@
-import { Card, Label, Input, Checkbox, Textarea } from 'theme-ui'
+import { Card, Label, Input, Checkbox, Textarea, Select } from 'theme-ui'
 import useForm from '../../lib/use-form'
+import { countries } from '../../lib/countries'
 import Submit from '../submit'
 
 const RequestForm = () => {
@@ -56,6 +57,15 @@ const RequestForm = () => {
           {...useField('zipCode')}
           placeholder="90069"
         />
+      </Label>
+      <Label>
+        Country
+        <Select {...useField('country')} defaultValue='Choose a country'>
+          <option value="" selected="selected">Choose a country</option>
+          {Object.entries(countries).map(country => (
+            <option value={country.slice(1)}>{country.slice(1)}</option>
+          ))}
+        </Select>
       </Label>
       <Submit status={status} />
     </form>
