@@ -1,11 +1,6 @@
-import axios from 'axios'
+import fetch from 'isomorphic-unfetch'
 const AirtablePlus = require('airtable-plus')
 
-const mailScenariosTable = new AirtablePlus({
-  apiKey: process.env.AIRTABLE_API_KEY,
-  baseID: 'apptEEFG5HTfGQE7h',
-  tableName: 'Mail Scenarios'
-})
 const peopleTable = new AirtablePlus({
   apiKey: process.env.AIRTABLE_API_KEY,
   baseID: 'apptEEFG5HTfGQE7h',
@@ -49,13 +44,16 @@ export default async (req, res) => {
       }))[0]
     }
 
-    axios.post(`https://hooks.zapier.com/hooks/catch/507705/o2dbufn/`, {
-      'test': false,
-      'scenarioRecordID': 'recNDwjb7Zr04Szix',
-      'receiverAddressRecordID': address.id,
-      'missionNotes': 'Requested via hackclub.com'
+    fetch(`https://hooks.zapier.com/hooks/catch/507705/o2dbufn/`, {
+      method: 'POST',
+      body: JSON.stringify({
+        'test': false,
+        'scenarioRecordID': 'recNDwjb7Zr04Szix',
+        'receiverAddressRecordID': address.id,
+        'missionNotes': 'Requested via hackclub.com'
+      })
     })
-      .then(r => res.json({ status: 'success' }))
+      .then(r => { console.log(r.statusText); res.json({ status: 'success' }) })
       .catch(err => console.log(err))
   }
 }
