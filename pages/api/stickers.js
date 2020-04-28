@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-unfetch'
+import axios from 'axios'
 const AirtablePlus = require('airtable-plus')
 
 const mailScenariosTable = new AirtablePlus({
@@ -8,58 +8,68 @@ const mailScenariosTable = new AirtablePlus({
 })
 const peopleTable = new AirtablePlus({
   apiKey: process.env.AIRTABLE_API_KEY,
-  basedID: 'apptEEFG5HTfGQE7h',
+  baseID: 'apptEEFG5HTfGQE7h',
   tableName: 'People'
 })
 const addressesTable = new AirtablePlus({
   apiKey: process.env.AIRTABLE_API_KEY,
-  basedID: 'apptEEFG5HTfGQE7h',
+  baseID: 'apptEEFG5HTfGQE7h',
   tableName: 'Addresses'
 })
 
 export default async (req, res) => {
   if (req.method === 'POST') {
-    const data = JSON.parse(body)
+    const data = JSON.parse(req.body)
     let address
 
     // fetch person record
-    const personRecord = await peopleTable.read({
+    let personRecord = await peopleTable.read({
       filterByFormula: `{Email} = '${data.email}'`,
       maxRecords: 1
-    })
-    if (typeof personRecord === 'undefined') {
-      let personRecord = await peopleTable.create({
+    }).catch(err => console.log(err))
+
+    if (personRecord.length === 0) {
+      personRecord = await peopleTable.create({
         'Full Name': data.name,
-        'Email': data.email,
-        'Address (first line)': data.addressFirst,
-        'Address (second line)': data.addressSecond,
-        'Address (city)': data.city,
-        'Address (state)': data.state,
-        'Address (zip code)': data.zipCode
+        'Email': data.email
       })
       address = await addressesTable.create({
-        'Address (first line)': data.addressFirst,
-        'Address (second line)': data.addressSecond,
-        'Address (city)': data.city,
-        'Address (state)': data.state,
-        'Address (zip code)': data.zipCode,
-        'Person': personRecord.id
+        'Street (First Line)': data.addressFirst,
+        'Street (Second Line': data.addressSecond,
+        'City': data.city,
+        'State/Province': data.state,
+        'Postal Code': data.zipCode,
+        'Person': [personRecord.id]
       })
     }
     else {
-      address = personRecord[0]
+      address = (await addressesTable.read({
+        filterByFormula: `{Person ID} = '${personRecord[0].fields['ID']}'`
+      }))[0]
     }
 
-    fetch(`${process.env.MAIL_MISSION_WEBHOOK}`, {
-      method: 'POST',
-      body: {
-        'test': false,
-        'scenarioRecordID': 'recNDwjb7Zr04Szix',
-        'receiverAddressRecordID': address.id,
-        'missionNotes': 'Requested via hackclub.com'
-      }
+    /*fetch(`https://hooks.zapier.com/hooks/catch/507705/o5jrdn3/`, {
+        method: 'POST',
+        body: {
+          'test': false,
+          'scenarioRecordID': 'recNDwjb7Zr04Szix',
+          'receiverAddressRecordID': address.id,
+          'missionNotes': 'Requested via hackclub.com'
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(r => { console.log(r.statusText); res.json({ status: 'success' }) })
+        .catch(err => console.log(err))*/
+
+    axios.post(`https://hooks.zapier.com/hooks/catch/507705/o2dbufn/`, {
+      'test': false,
+      'scenarioRecordID': 'recNDwjb7Zr04Szix',
+      'receiverAddressRecordID': address.id,
+      'missionNotes': 'Requested via hackclub.com'
     })
-      .then(r => r.json())
-      .then(r => res.json({ status: r.status }))
+      .then(r => res.json({ status: 'success' }))
+      .catch(err => console.log(err))
   }
 }

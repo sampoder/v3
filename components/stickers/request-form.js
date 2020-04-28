@@ -3,7 +3,7 @@ import useForm from '../../lib/use-form'
 import Submit from '../submit'
 
 const RequestForm = () => {
-  const { status, formProps, useField } = useForm('/api/join')
+  const { status, formProps, useField } = useForm('/api/stickers')
 
   return (
     <form {...formProps}>
@@ -17,6 +17,44 @@ const RequestForm = () => {
           {...useField('email')}
           placeholder="fiona@hackclub.com"
           required
+        />
+      </Label>
+      <Label>
+        Address (first line)
+        <Input
+          {...useField('addressFirst')}
+          placeholder="8605 Santa Monica Blvd"
+          required
+        />
+      </Label>
+      <Label>
+        Address (second line) (optional)
+        <Input
+          {...useField('addressSecond')}
+          placeholder="#86294"
+        />
+      </Label>
+      <Label>
+        City
+        <Input
+          {...useField('city')}
+          placeholder="West Hollywood"
+          required
+        />
+      </Label>
+      <Label>
+        State/Province
+        <Input
+          {...useField('state')}
+          placeholder="California"
+          required
+        />
+      </Label>
+      <Label>
+        Zip Code
+        <Input
+          {...useField('zipCode')}
+          placeholder="90069"
         />
       </Label>
       <Submit status={status} />
